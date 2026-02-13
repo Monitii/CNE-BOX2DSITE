@@ -8,7 +8,7 @@ var box2dDebugGroup:FlxGroup;
 var box2dDebugFixtures:Array<Dynamic> = [];
 
 function postCreate() {
-    // debug group and sprites
+    // debug group and sprites, add anywhere in your postCreate function.
     box2dDebugGroup = new FlxGroup();
     add(box2dDebugGroup);
     if (box2dDebugEnabled) {
@@ -27,10 +27,17 @@ function createDebugForBody(bodyId:Int):Void {
             s.makeGraphic(diameter, diameter, FlxColor.TRANSPARENT);
             
             FlxSpriteUtil.drawCircle(s, f.radius, f.radius, f.radius, FlxColor.TRANSPARENT, {thickness: 2, color: FlxColor.RED});
+            
+            FlxSpriteUtil.drawLine(s, f.radius, f.radius, f.radius * 2, f.radius, {thickness: 2, color: FlxColor.YELLOW});
+            
+            FlxSpriteUtil.drawCircle(s, f.radius, f.radius, 3, FlxColor.LIME);
+            
             s.alpha = 0.35;
         } else {
             s.makeGraphic(Math.ceil(f.hx), Math.ceil(f.hy), FlxColor.RED);
             s.alpha = 0.35;
+            
+            FlxSpriteUtil.drawCircle(s, f.hx / 2, f.hy / 2, 3, FlxColor.LIME);
         }
         
         box2dDebugGroup.add(s);
@@ -39,7 +46,8 @@ function createDebugForBody(bodyId:Int):Void {
 }
 
 function update(elapsed:Float) {
-    if (box2dDebugEnabled) updateDebugSprites();
+
+    if (box2dDebugEnabled) updateDebugSprites(); // add anywhere inside ur update function
 }
 
 // add below update function

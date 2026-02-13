@@ -1,9 +1,10 @@
 import flixel.FlxG;
+import flixel.util.FlxSpriteUtil;
 importScript("data/scripts/Box2D.hx");
 
 /*
 This is an example script for CNE-Box2D.
-Box2D for Codename Engine! this script makes a physics object, and makes BF follow it.
+Box2D for Codename Engine! this script makes you be able to pick up BF.
 */
 
 var box2dDebugEnabled:Bool = true;
@@ -33,7 +34,7 @@ function postCreate() {
     whiteSquare = new FlxSprite();
     // these give the bodies their "fixtures" also known as their collision. 
     box2d_addBox(floor, 4000, 50, 0);
-    box2d_addBox(bfBody, 300, 300, 1);
+    box2d_addBox(bfBody, bfChar.width, bfChar.height, 1);
     FlxG.mouse.visible = true;
 
     // Create invisible mouse body (kinematic type = 1, moves but isn't affected by forces)
@@ -55,8 +56,25 @@ function createDebugForBody(bodyId:Int):Void {
     var fixtures = box2d_getFixtures(bodyId);
     for (f in fixtures) {
         var s = new FlxSprite();
-        s.makeGraphic(Math.ceil(f.hx), Math.ceil(f.hy), FlxColor.RED);
-        s.alpha = 0.35;
+        
+        if (f.isCircle) {
+            var diameter = Math.ceil(f.radius * 2);
+            s.makeGraphic(diameter, diameter, FlxColor.TRANSPARENT);
+            
+            FlxSpriteUtil.drawCircle(s, f.radius, f.radius, f.radius, FlxColor.TRANSPARENT, {thickness: 2, color: FlxColor.RED});
+            
+            FlxSpriteUtil.drawLine(s, f.radius, f.radius, f.radius * 2, f.radius, {thickness: 2, color: FlxColor.YELLOW});
+            
+            FlxSpriteUtil.drawCircle(s, f.radius, f.radius, 3, FlxColor.LIME);
+            
+            s.alpha = 0.35;
+        } else {
+            s.makeGraphic(Math.ceil(f.hx), Math.ceil(f.hy), FlxColor.RED);
+            s.alpha = 0.35;
+            
+            FlxSpriteUtil.drawCircle(s, f.hx / 2, f.hy / 2, 3, FlxColor.LIME);
+        }
+        
         box2dDebugGroup.add(s);
         box2dDebugFixtures.push({ bodyId: bodyId, fixture: f, sprite: s });
     }
@@ -116,22 +134,22 @@ function updateDebugSprites():Void {
         var pos = box2d_getPos(d.bodyId);
         var rot = box2d_getAngle(d.bodyId);
         if (pos == null) continue;
+        
         var f = d.fixture;
         var s:FlxSprite = d.sprite;
-        s.x = pos[0] + f.ox - (f.hx / 2);
-        s.y = pos[1] + f.oy - (f.hy / 2);
+        
+        if (f.isCircle) {
+            s.x = pos[0] - f.radius;
+            s.y = pos[1] - f.radius;
+        } else {
+            s.x = pos[0] + f.ox - (f.hx / 2);
+            s.y = pos[1] + f.oy - (f.hy / 2);
+        }
+        
         s.angle = -rot * 180.0 / Math.PI;
     }
 }
 
 function draw() {
- /* get the position and rotation of the box2d body and set bf to it!
-    (yes i really could not think of a better way to do this) */
-
-    //BF POS and ROT
-    var bfPhysPos = box2d_getPos(bfBody);
-    var bfPhysRot = box2d_getAngle(bfBody);
-    bfChar.x = bfPhysPos[0] - 200;
-    bfChar.y = bfPhysPos[1] - 575;
-    bfChar.angle = -bfPhysRot * 180.0 / Math.PI; // box2d angle is in radians and clockwise, flixel is in degrees and counterclockwise, so convert and negate.
+    box2d_syncSprite(bfBody, bfChar, -200, -565);
 }

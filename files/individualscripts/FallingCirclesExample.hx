@@ -60,11 +60,18 @@ function createDebugForBody(bodyId:Int):Void {
             var diameter = Math.ceil(f.radius * 2);
             s.makeGraphic(diameter, diameter, FlxColor.TRANSPARENT);
             
-            FlxSpriteUtil.drawCircle(s, f.radius, f.radius, f.radius, FlxColor.TRANSPARENT, {thickness: 6, color: FlxColor.RED});
+            FlxSpriteUtil.drawCircle(s, f.radius, f.radius, f.radius, FlxColor.TRANSPARENT, {thickness: 2, color: FlxColor.RED});
+
+            FlxSpriteUtil.drawLine(s, f.radius, f.radius, f.radius * 2, f.radius, {thickness: 2, color: FlxColor.YELLOW});
+            
+            FlxSpriteUtil.drawCircle(s, f.radius, f.radius, 3, FlxColor.LIME);
+            
             s.alpha = 0.35;
         } else {
             s.makeGraphic(Math.ceil(f.hx), Math.ceil(f.hy), FlxColor.RED);
             s.alpha = 0.35;
+            
+            FlxSpriteUtil.drawCircle(s, f.hx / 2, f.hy / 2, 3, FlxColor.LIME);
         }
         
         box2dDebugGroup.add(s);
