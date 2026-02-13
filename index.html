@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNE-Box2D</title>
+   <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Mono', 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a14 0%, #0d111f 50%, #0a1929 100%);
+            color: #e0e0e0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 20, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0 1rem 1rem;
+            border-bottom: 3px solid #9d4edd;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(157, 78, 221, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            max-width: 1400px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #c77dff, #e0aaff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 80px;
+            width: 280px;
+            height: calc(100vh - 80px);
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem 1rem;
+            overflow-y: auto;
+            border-right: 2px solid #9d4edd;
+        }
+
+        .sidebar h3 {
+            color: #e0aaff;
+            margin: 1.5rem 0 0.8rem;
+            font-size: 1.1rem;
+            padding-left: 0.5rem;
+            border-left: 3px solid #9d4edd;
+        }
+
+        .sidebar h3:first-child {
+            margin-top: 0;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin: 0.5rem 0;
+        }
+
+        .sidebar a {
+            color: #b0b0b0;
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .sidebar a:hover {
+            background: rgba(157, 78, 221, 0.2);
+            color: #e0aaff;
+            transform: translateX(5px);
+        }
+
+        /* Main Content */
+        main {
+            margin-left: 280px;
+            margin-top: 80px;
+            padding: 3rem;
+            flex: 1;
+            max-width: 1200px;
+        }
+
+        .welcome-section {
+            background: rgba(157, 78, 221, 0.1);
+            border: 2px solid #9d4edd;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 20px rgba(157, 78, 221, 0.2);
+        }
+
+        .welcome-section h2 {
+            color: #e0aaff;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-section p {
+            color: #d0d0d0;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            color: #c77dff;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #9d4edd;
+        }
+
+        .function-group {
+            background: rgba(20, 25, 30, 0.6);
+            border: 1px solid #333;
+            border-left: 3px solid #9d4edd;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+            transition: border-left-color 0.3s;
+        }
+
+        .function-group:hover {
+            border-left-color: #c77dff;
+        }
+
+        .function-name {
+            color: #5bc0de;
+            font-family: 'Roboto Mono', 'Courier New', monospace;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.4rem 0.8rem;
+            border-radius: 3px;
+            border: 1px solid rgba(91, 192, 222, 0.2);
+        }
+
+        .function-description {
+            color: #b0b0b0;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+        }
+
+        code {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            color: #5bc0de;
+            font-family: 'Roboto Mono', 'Courier New', monospace;
+            font-weight: 500;
+        }
+
+        .note {
+            background: rgba(199, 125, 255, 0.1);
+            border-left: 4px solid #c77dff;
+            padding: 1rem;
+            margin: 2rem 0;
+            border-radius: 6px;
+        }
+
+        .note strong {
+            color: #e0aaff;
+        }
+
+        .credits {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(199, 125, 255, 0.2));
+            border: 2px solid #9d4edd;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .download-item {
+            background: rgba(20, 25, 30, 0.6);
+            border: 1px solid #333;
+            border-left: 3px solid #9d4edd;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .download-item h3 {
+            color: #c77dff;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .download-item p {
+            color: #b0b0b0;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(157, 78, 221, 0.2);
+            color: #c77dff;
+            text-decoration: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            border: 1px solid #9d4edd;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            background: rgba(157, 78, 221, 0.4);
+            border-color: #c77dff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
+        }
+
+        .download-icon {
+            font-size: 1.1rem;
+        }
+
+        .credits {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(199, 125, 255, 0.2));
+            border: 2px solid #9d4edd;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .credits p {
+            color: #e0aaff;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .credits .heart {
+            color: #ff6b9d;
+            font-size: 1.5rem;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(10, 10, 20, 0.8);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #9d4edd;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c77dff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            main {
+                margin-left: 0;
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<link rel="icon" type="image/x-icon" href="img/favicon.ico">
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="img/icon.png" alt="Logo">
+                </div>
+                <div>
+                    <h1>CNE-Box2D</h1>
+                    <div class="subtitle">A port of Box2D to FNF Codename Engine</div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <aside class="sidebar">
+        <h3>Getting Started</h3>
+        <ul>
+            <li><a href="#coordinate">Coordinate Conversion</a></li>
+            <li><a href="#init">Initialization</a></li>
+            <li><a href="#world">World Management</a></li>
+        </ul>
+
+        <h3>Bodies</h3>
+        <ul>
+            <li><a href="#creation">Body Creation</a></li>
+            <li><a href="#getters">Body Getters</a></li>
+            <li><a href="#setters">Body Setters</a></li>
+        </ul>
+
+        <h3>Physics</h3>
+        <ul>
+            <li><a href="#forces">Forces & Impulses</a></li>
+            <li><a href="#fixture-props">Fixture Properties</a></li>
+            <li><a href="#body-props">Body Properties</a></li>
+        </ul>
+
+        <h3>Joints</h3>
+        <ul>
+            <li><a href="#joints">Joints</a></li>
+        </ul>
+
+        <h3>Downloads</h3>
+        <ul>
+            <li><a href="#maindownload">Main Download</a></li>
+            <li><a href="#examples">Example Scripts</a></li>
+        </ul>
+    </aside>
+
+    <main>
+        <div class="welcome-section">
+            <h2>Welcome to CNE-Box2D</h2>
+            <p>
+                This is a WIP port of Box2D physics engine to Codename Engine (FNF). 
+                Add Physics to anything, make BF bouncy, Make a huge wrecking ball that kills everyone!!!
+                (Almost) anything is possible! And the docs are here to explain everything possible.
+            </p>
+        </div>
+
+        <section id="coordinate" class="section">
+            <h2 class="section-title">Coordinate Conversion</h2>
+            
+            <div class="function-group">
+                <div class="function-name">pxToWorldX(pixels)</div>
+                <div class="function-name">pxToWorldY(pixels)</div>
+                <div class="function-description">
+                    Convert pixel coordinates to Box2D world units (meters). Box2D uses meters as its base unit, 
+                    so you'll need to convert your pixel positions before passing them to physics functions.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">worldToPxX(meters)</div>
+                <div class="function-name">worldToPxY(meters)</div>
+                <div class="function-description">
+                    Convert Box2D world units (meters) back to pixel coordinates. Use these to position your 
+                    visual sprites based on physics body positions.
+                </div>
+            </div>
+        </section>
+
+        <section id="init" class="section">
+            <h2 class="section-title">Initialization</h2>
+            
+            <div class="function-group">
+                <div class="function-name">box2d_init()</div>
+                <div class="function-description">
+                    Loads all Box2D functions from the NDLL (Native Dynamic Link Library). 
+                    <strong>Call this first!</strong> Returns <code>true</code> if successful, <code>false</code> otherwise.
+                </div>
+            </div>
+        </section>
+
+        <section id="world" class="section">
+            <h2 class="section-title">World Management</h2>
+            
+            <div class="function-group">
+                <div class="function-name">box2d_createWorld(gravityX, gravityY)</div>
+                <div class="function-description">
+                    Creates a physics world with specified gravity. Returns a world ID that you'll use for all other operations.
+                    Typical gravity: <code>gravityX = 0</code>, <code>gravityY = 9.8</code> (or higher for more dramatic effect).
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_step(worldId, timestep, velocityIterations, positionIterations)</div>
+                <div class="function-description">
+                    Advances the physics simulation by one timestep. Call this every frame to update the physics world.
+                    Recommended values: <code>timestep = 1/60</code>, <code>velocityIterations = 8</code>, 
+                    <code>positionIterations = 3</code>.
+                </div>
+            </div>
+        </section>
+
+        <section id="creation" class="section">
+            <h2 class="section-title">Body Creation</h2>
+            
+            <div class="function-group">
+                <div class="function-name">box2d_createBody(worldId, x, y, type)</div>
+                <div class="function-description">
+                    Creates a physics body at the specified position (in pixels). Returns a body ID.
+                    <br><br>
+                    <strong>Body types:</strong><br>
+                    • <code>0 = static</code> - Never moves (floors, walls)<br>
+                    • <code>1 = kinematic</code> - Moves but unaffected by forces (moving platforms)<br>
+                    • <code>2 = dynamic</code> - Full physics simulation (players, objects)
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_addBox(bodyId, width, height, offsetX, offsetY)</div>
+                <div class="function-description">
+                    Adds a rectangular collision shape (fixture) to a body. Size and offset are in pixels.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_addCircle(bodyId, radius, offsetX, offsetY)</div>
+                <div class="function-description">
+                    Adds a circular collision shape to a body. Radius and offset are in pixels.
+                </div>
+            </div>
+        </section>
+
+        <section id="getters" class="section">
+            <h2 class="section-title">Body Getters</h2>
+            
+            <div class="function-group">
+                <div class="function-name">box2d_getPos(bodyId)</div>
+                <div class="function-description">
+                    Gets the body's position as an array <code>[x, y]</code> in pixels.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_getPosObj(bodyId)</div>
+                <div class="function-description">
+                    Gets the body's position as an object <code>{x: value, y: value}</code> in pixels.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_getAngle(bodyId)</div>
+                <div class="function-description">
+                    Gets the body's rotation angle in radians. Convert to degrees with <code>angle * 180 / Math.PI</code>.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_getFixtures(bodyId)</div>
+                <div class="function-description">
+                    Gets a list of all collision shapes (fixtures) attached to this body.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_getAngVel(bodyId)</div>
+                <div class="function-description">
+                    Gets the body's angular velocity (how fast it's rotating) in radians per second.
+                </div>
+            </div>
+        </section>
+
+        <section id="setters" class="section">
+            <h2 class="section-title">Body Setters</h2>
+            
+            <div class="function-group">
+                <div class="function-name">box2d_setBodyTransform(bodyId, x, y, angle)</div>
+                <div class="function-description">
+                    Directly sets the body's position (in pixels) and rotation (in radians). 
+                    Use sparingly - prefer forces/impulses for realistic physics.
+                </div>
+            </div>
+        </section>
+
+        <section id="forces" class="section">
+            <h2 class="section-title">Forces & Impulses</h2>
+            
+            <div class="function-group">
+                <div class="function-name">box2d_impulse(bodyId, forceX, forceY)</div>
+                <div class="function-description">
+                    Applies an instant linear force to the body's center (like a kick or explosion). 
+                    Great for jumps, knockback, and instant velocity changes.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_impulseVec(bodyId, forceVector)</div>
+                <div class="function-description">
+                    Same as <code>box2d_impulse</code> but takes a vector/object parameter: 
+                    <code>{x: forceX, y: forceY}</code>.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_torque(bodyId, torque)</div>
+                <div class="function-description">
+                    Applies a rotational force to make the body spin. Positive values spin clockwise, 
+                    negative values spin counter-clockwise.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_setAngVel(bodyId, velocity)</div>
+                <div class="function-description">
+                    Directly sets the rotation speed in radians per second. Use for controlled spinning.
+                </div>
+            </div>
+        </section>
+
+        <section id="fixture-props" class="section">
+            <h2 class="section-title">Physical Properties (Fixture)</h2>
+            
+            <div class="function-group">
+                <div class="function-name">box2d_setRestitution(fixtureId, value)</div>
+                <div class="function-description">
+                    Sets the bounciness of a collision shape.<br>
+                    • <code>0.0</code> = No bounce (soft landing)<br>
+                    • <code>1.0</code> = Perfect bounce (basketball)<br>
+                    • <code>&gt;1.0</code> = Gains energy (super bouncy!)
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_setFriction(fixtureId, value)</div>
+                <div class="function-description">
+                    Sets the surface friction.<br>
+                    • <code>0.0</code> = Ice (no friction)<br>
+                    • <code>0.3</code> = Default (normal surface)<br>
+                    • <code>1.0+</code> = Sticky/rough surface
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_setDensity(fixtureId, value)</div>
+                <div class="function-description">
+                    Sets the density which affects mass and weight. Higher density = heavier object 
+                    (harder to move, more momentum).
+                </div>
+            </div>
+        </section>
+
+        <section id="body-props" class="section">
+            <h2 class="section-title">Physical Properties (Body)</h2>
+            
+            <div class="function-group">
+                <div class="function-name">box2d_setLinearDamping(bodyId, value)</div>
+                <div class="function-description">
+                    Sets air resistance for movement.<br>
+                    • <code>0.0</code> = No air resistance<br>
+                    • Higher values = More drag (slower movement over time)
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_setAngularDamping(bodyId, value)</div>
+                <div class="function-description">
+                    Sets air resistance for rotation. Higher values make spinning slow down faster.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_setGravityScale(bodyId, value)</div>
+                <div class="function-description">
+                    Sets the gravity multiplier for this specific body.<br>
+                    • <code>1.0</code> = Normal gravity<br>
+                    • <code>0.0</code> = No gravity (floating)<br>
+                    • <code>-1.0</code> = Reverse gravity (flies up!)<br>
+                    • <code>2.0</code> = Double gravity (heavy)
+                </div>
+            </div>
+        </section>
+
+        <section id="joints" class="section">
+            <h2 class="section-title">Joints</h2>
+            
+            <div class="function-group">
+                <div class="function-name">box2d_createRevoluteJointWorld(worldId, bodyId, anchorX, anchorY)</div>
+                <div class="function-description">
+                    Pins a body to a fixed point in the world (like a hinge or pivot). The body can rotate 
+                    around the anchor point but not move away from it. Perfect for pendulums, doors, or ragdoll limbs.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_createRevoluteJointBetween(worldId, bodyA, bodyB, anchorX, anchorY)</div>
+                <div class="function-description">
+                    Connects two bodies with a rotating joint at the specified anchor point. Both bodies can 
+                    rotate freely around the connection point. Great for chains, rope bridges, or connected objects.
+                </div>
+            </div>
+
+            <div class="function-group">
+                <div class="function-name">box2d_destroyJoint(worldId, jointId)</div>
+                <div class="function-description">
+                    Removes a joint and disconnects the bodies. They'll become independent again.
+                </div>
+            </div>
+        </section>
+
+        <div class="note">
+            <strong>Tip:</strong> Box2D often likes objects between 0.1 and 10 meters in size. 
+            for best results, stick to that range.
+        </div>
+
+                <section id="maindownload" class="section">
+            <h2 class="section-title">Main Download</h2>
+            
+            <div class="download-item">
+                <h3>CNE-Box2D Setup Pack</h3>
+                <p>Complete setup package including the NDLL file and a Haxe script that you import to get started with CNE-Box2D.</p>
+                <div class="download-buttons">
+                    <a href="files/CNE-Box2D.zip" class="download-btn" download>
+                        <span class="download-icon">⬇</span>
+                        CNE-Box2D.zip
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="examples" class="section">
+            <h2 class="section-title">Example Scripts</h2>
+            
+            <div class="download-item">
+                <h3>Falling Circles Example</h3>
+                <p>Makes balls fall from the sky!</p>
+                <div class="download-buttons">
+                    <a href="files/individualscripts/FallingCirclesExample.hx" class="download-btn" download>
+                        <span class="download-icon">⬇</span>
+                        FallingCirclesExample.hx
+                    </a>
+                </div>
+            </div>
+
+            <div class="download-item">
+                <h3>Grabbing Example</h3>
+                <p>Makes it so you can push and grab Boyfriend around.</p>
+                <div class="download-buttons">
+                    <a href="files/individualscripts/GrabbingExample.hx" class="download-btn" download>
+                        <span class="download-icon">⬇</span>
+                        GrabbingExample.hx
+                    </a>
+                </div>
+            </div>
+
+            <div class="download-item">
+                <h3>Physical Characters Example</h3>
+                <p>Adds simple dynamic physics to Boyfriend and Dad.</p>
+                <div class="download-buttons">
+                    <a href="files/individualscripts/PhysicalCharactersExample.hx" class="download-btn" download>
+                        <span class="download-icon">⬇</span>
+                        PhysicalCharactersExample.hx
+                    </a>
+                </div>
+            </div>
+
+            <div class="download-item">
+                <h3>Note Follow Example</h3>
+                <p>Makes Boyfriend and Dad fling and spin whenever they hit a note!</p>
+                <div class="download-buttons">
+                    <a href="files/individualscripts/NoteFollowExample.hx" class="download-btn" download>
+                        <span class="download-icon">⬇</span>
+                        NoteFollowExample.hx
+                    </a>
+                </div>
+            </div>
+
+            <div class="download-item">
+                <h3>Debug Example</h3>
+                <p>Shows you how to setup debugging fixtures inside your script.</p>
+                <div class="download-buttons">
+                    <a href="files/individualscripts/DebugExample.hx" class="download-btn" download>
+                        <span class="download-icon">⬇</span>
+                        NoteFollowExample.hx
+                    </a>
+                </div>
+            </div>
+
+            <div class="download-item">
+                <h3>All Examples Pack</h3>
+                <p>Download all example scripts in a single ZIP file.</p>
+                <div class="download-buttons">
+                    <a href="files/CNE-Box2DExamples.zip" class="download-btn" download>
+                        <span class="download-icon">⬇</span>
+                        CNE-Box2DExamples.zip
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <div class="credits">
+            <p>I put a ton of effort into this project!</p>
+            <p>Support and contribution is greatly appreciated! - Garret</p>
+        </div>
+    </main>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
